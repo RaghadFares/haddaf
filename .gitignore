@@ -34,3 +34,4 @@ runs/
 runs/detect/
 *.pt
 runs/detect/
+debug_output/ 
