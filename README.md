@@ -1,13 +1,18 @@
-# Haddaf ⚽ — Football Action Recognition
+# Haddaf — Football Action Recognition
 
-An AI-powered system that analyzes football video footage and recognizes player actions 
+An AI-powered system that analyzes football video footage and recognizes player actions.
 
+---
 
-## ⚠️ Important: Before You Start
+## Important: Before You Start
 
-The `models/` folder is **not included** in this repository because the files are too large for GitHub.
+The `models/` folder is not included in this repository due to file size limitations.
 
-**You must get the `models/` folder separately** (ask the team leader to share it via Google Drive or OneDrive), then place it inside the project folder like this:
+You must download it separately from the link below and place it inside the project folder before running anything.
+
+**Download models folder:** https://drive.google.com/drive/folders/1f2kR-Oso6yrBaIdugcLPEWAR4mmOmDRh?usp=sharing
+
+After downloading, your project structure should look like this:
 
 ```
 Haddaf_model-main/
@@ -22,26 +27,23 @@ Haddaf_model-main/
 
 ---
 
-## 🚀 How to Run
+## How to Run
 
-### 1. Install Requirements
-
-Make sure you have Python installed, then run:
+**Step 1 — Install requirements**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Set Your Video Path
+**Step 2 — Set your video path**
 
 Open `test_server.py` and update the video path to point to your video file:
 
 ```python
-# Change this to your actual video path
 video_path = "C:/Users/yourname/path/to/your/video.mp4"
 ```
 
-### 3. Start the Server
+**Step 3 — Start the server**
 
 In one terminal, run:
 
@@ -49,11 +51,11 @@ In one terminal, run:
 python server.py
 ```
 
-Wait until you see the server is running.
+Wait until the server is running before moving to the next step.
 
-### 4. Run the Test
+**Step 4 — Run the test**
 
-In a **second terminal**, run:
+In a second terminal, run:
 
 ```bash
 python test_server.py
@@ -61,24 +63,24 @@ python test_server.py
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-├── models/              ← AI models (get separately, not on GitHub)
-├── trackers/            ← Player tracking logic
-├── utils/               ← Helper functions
-├── server.py            ← Main server (run this first)
-├── test_server.py       ← Send video and get results (run this second)
-├── main.py              ← Core processing logic
-├── action_recognizer.py ← Action recognition module
-├── requirements.txt     ← Python dependencies
-└── Dockerfile           ← Docker configuration
+├── models/              # AI models (download separately)
+├── trackers/            # Player tracking logic
+├── utils/               # Helper functions
+├── server.py            # Main server
+├── test_server.py       # Sends video and retrieves results
+├── main.py              # Core processing logic
+├── action_recognizer.py # Action recognition module
+├── requirements.txt     # Python dependencies
+└── Dockerfile           # Docker configuration
 ```
 
 ---
 
-## 🛠️ Requirements
+## Requirements
 
 - Python 3.x
 - All packages listed in `requirements.txt`
-- The `models/` folder (shared separately)
+- The `models/` folder downloaded from the link above
