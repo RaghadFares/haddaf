@@ -4,6 +4,8 @@
 
 **Haddaf** is an AI-Powered Football Talents Discovery and Tracking Application.
 
+**Haddaf Mobile Application:** [https://github.com/Leen0th/2025_GP_Group17](https://github.com/Leen0th/2025_GP_Group17)
+
 The goal of the project is to provide players, coaches, and scouts with an intelligent system to evaluate player performance based on match video clips. By applying computer vision and machine learning techniques, Haddaf automatically extracts key performance metrics — giving players a platform to showcase their skills, helping coaches track their players' performance, and supporting scouts in talent discovery.
 
 ---
@@ -62,9 +64,8 @@ pip install -r requirements.txt
 
 ### Step 2 — Choose a Testing Video
 
-1. Download the testing videos from:
-[https://drive.google.com/drive/u/2/folders/1_55ijHhFhqmOD9QFI4GcJ7QteenO6LfG](https://drive.google.com/drive/u/2/folders/1_55ijHhFhqmOD9QFI4GcJ7QteenO6LfG)
-2. Open the **PDF file inside the testing videos folder**.
+1. Download the testing videos and coordinates PDF from the link above.
+2. Open the **PDF file** inside the testing videos folder.
 3. Find the coordinates that correspond to your selected video.
 
 ---
@@ -137,5 +138,4 @@ The system will:
 - Python 3.x
 - All packages listed in `requirements.txt`
 - The `models/` folder downloaded from the models link
-- Testing videos downloaded from the testing videos link
 - Coordinates selected correctly from the PDF inside the testing videos folder
