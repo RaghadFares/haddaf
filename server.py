@@ -11,7 +11,6 @@ import traceback
 from datetime import datetime
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from huggingface_hub import hf_hub_download
 
 # ================== App / Paths ==================
 app = Flask(__name__)
@@ -23,40 +22,6 @@ DEBUG_DIR = os.path.join(BASE_DIR, "debug_output")
 
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.makedirs(DEBUG_DIR, exist_ok=True)
-
-# ================== Download Models from Hugging Face ==================
-HF_REPO_ID = "lujain-721/Haddaf_New_Model"
-
-HF_FILES = [
-    "detect_best.pt",
-    "pose_best.pt",
-    "best_ensemble_classifier.pkl",
-    "feature_scaler_lgbm.joblib",
-    "label_encoder_lgbm.joblib",
-]
-
-def download_models():
-    print("=" * 60)
-    print("Checking / downloading models from Hugging Face...")
-    print(f"Repo: {HF_REPO_ID}")
-    print("=" * 60)
-    for filename in HF_FILES:
-        dest = os.path.join(MODELS_DIR, filename)
-        if os.path.exists(dest):
-            print(f"✅ Already exists: {filename}")
-            continue
-        print(f"⬇️  Downloading {filename}...")
-        hf_hub_download(
-            repo_id=HF_REPO_ID,
-            filename=filename,
-            local_dir=MODELS_DIR,
-        )
-        print(f"✅ Downloaded: {filename}")
-    print("All models ready.")
-    print("=" * 60)
-
-# Download models at startup
-download_models()
 
 # ================== Model Paths ==================
 DETECTION_WEIGHTS    = os.path.join(MODELS_DIR, "detect_best.pt")
@@ -82,21 +47,25 @@ def apply_reality_logic(counts):
     original = dict(counts)
 
     # RULE 1: Header overrides everything
+    # If header detected, it dominates — remove all other actions
+    # (header is a very specific pose, unlikely to co-occur with other actions for same player)
     if has_header:
         counts = {k: (v if k == 'header' else 0) for k, v in counts.items()}
         print(f"[REALITY LOGIC] Header detected — keeping only header. Before: {original}")
         return counts
 
     # RULE 2: Tackle + (dribble or pass) = opponent tackle, remove tackle
+    # The tackle belongs to the opposing player, not the tracked player
     if has_tackle and (has_dribble or has_pass):
         counts['tackle'] = 0
         print(f"[REALITY LOGIC] Tackle removed (dribble/pass present = opponent tackle). Before: {original}")
 
-    # RULE 3: Tackle + only shoot = remove shoot
-    has_tackle_now  = counts.get('tackle', 0) > 0
-    has_shoot_now   = counts.get('shoot', 0) > 0
+    # RULE 3: Tackle + only shoot = remove shoot (player was running before sliding)
+    # Re-evaluate after rule 2
+    has_tackle_now = counts.get('tackle', 0) > 0
+    has_shoot_now  = counts.get('shoot', 0) > 0
     has_dribble_now = counts.get('dribble', 0) > 0
-    has_pass_now    = counts.get('pass', 0) > 0
+    has_pass_now   = counts.get('pass', 0) > 0
 
     if has_tackle_now and has_shoot_now and not has_dribble_now and not has_pass_now:
         counts['shoot'] = 0
@@ -277,12 +246,13 @@ def analyze_video():
                 env=env_limited,
             )
 
-        # PASS 1: Run at zoom=1.3
+        # PASS 1: Run at zoom=1.3 (better quality for dribble/pass/shoot/header)
         result = run_pipeline(1.3)
         stdout_text = result.stdout or ""
         stderr_text = result.stderr or ""
 
-        # Check for tackle signal
+        # Check if any frame had tackle probability >= 0.03
+        # If yes, run PASS 2 at zoom=2.0 which improves ankle visibility for tackles
         tackle_signal = False
         for line in stdout_text.splitlines():
             if "'tackle':" in line:
@@ -300,6 +270,7 @@ def analyze_video():
             result2 = run_pipeline(2.0)
             stdout_text2 = result2.stdout or ""
             stderr_text2 = result2.stderr or ""
+            # Use pass 2 results (zoom=2.0 is better for tackle detection)
             print("[TWO-PASS] Using zoom=2.0 results")
             print(f"Return code (pass2): {result2.returncode}")
             print("=== SUBPROCESS STDOUT (pass2) ===")
